@@ -1,9 +1,9 @@
 {
     "name": "quillstack/header-bag",
-    "description": "A bag for headers.",
+    "description": "A simple solution to use headers according to PSR-7.",
     "type": "library",
     "license": "MIT",
-    "homepage": "https://quillstack.com/header-bag/",
+    "homepage": "https://quillstack.com/headers/",
     "authors": [
         {
             "name": "Radek Ziemniewicz",

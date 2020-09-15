@@ -165,7 +165,7 @@ final class HeaderBag implements MessageInterface
      */
     public function withProtocolVersion($version)
     {
-        throw new MethodNotImplementedException('Method `getProtocolVersion` doesn\'t exist');
+        throw new MethodNotImplementedException('Method `withProtocolVersion` doesn\'t exist');
     }
 
     /**
@@ -173,7 +173,7 @@ final class HeaderBag implements MessageInterface
      */
     public function getBody()
     {
-        throw new MethodNotImplementedException('Method `getProtocolVersion` doesn\'t exist');
+        throw new MethodNotImplementedException('Method `getBody` doesn\'t exist');
     }
 
     /**
@@ -181,6 +181,6 @@ final class HeaderBag implements MessageInterface
      */
     public function withBody(StreamInterface $body)
     {
-        throw new MethodNotImplementedException('Method `getProtocolVersion` doesn\'t exist');
+        throw new MethodNotImplementedException('Method `withBody` doesn\'t exist');
     }
 }

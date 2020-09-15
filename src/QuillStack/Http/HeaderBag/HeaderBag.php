@@ -67,9 +67,7 @@ final class HeaderBag implements MessageInterface
 
         $index = $this->getHeaderIndex($name);
 
-        return [
-            $name => array_values($this->headers)[$index],
-        ];
+        return explode(',', array_values($this->headers)[$index]);
     }
 
     /**

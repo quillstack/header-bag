@@ -1,4 +1,6 @@
-composer.phar
 /vendor/
-.idea
+.idea/
+coverage
 .phpunit.result.cache
+.scannerwork/
+phpunit.*.xml

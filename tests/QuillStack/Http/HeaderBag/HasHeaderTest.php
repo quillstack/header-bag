@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace QuillStack\Http\HeaderBag;
+
+use PHPUnit\Framework\TestCase;
+use QuillStack\Mocks\HeaderBag\SimpleHeaders;
+
+final class HasHeaderTest extends TestCase
+{
+    /**
+     * @var HeaderBag
+     */
+    private HeaderBag $bag;
+
+    /**
+     * @var string[]
+     */
+    private array $headers;
+
+    public function setUp(): void
+    {
+        $this->headers = (new SimpleHeaders())->headers;
+        $this->bag = new HeaderBag($this->headers);
+    }
+
+    public function testHasOneWordHeader()
+    {
+        $this->assertTrue($this->bag->hasHeader(':authority'));
+        $this->assertTrue($this->bag->hasHeader(':aUthority'));
+    }
+
+    public function testHasManyWordsHeader()
+    {
+        $this->assertTrue($this->bag->hasHeader('if-none-match'));
+        $this->assertTrue($this->bag->hasHeader('If-None-Match'));
+    }
+
+    public function testHasCamelCaseWordsHeader()
+    {
+        $this->assertTrue($this->bag->hasHeader('sec-fetch-mode'));
+        $this->assertTrue($this->bag->hasHeader('Sec-Fetch-Mode'));
+    }
+
+    public function testDoesntHaveHeader()
+    {
+        $this->assertFalse($this->bag->hasHeader(':autority'));
+        $this->assertFalse($this->bag->hasHeader('authority'));
+    }
+
+    public function testDoesntHaveManyWordsHeader()
+    {
+        $this->assertFalse($this->bag->hasHeader('ifnonematch'));
+        $this->assertFalse($this->bag->hasHeader('IfNoneMatch'));
+    }
+
+    public function testDoesntHaveCamelCaseWordsHeader()
+    {
+        $this->assertFalse($this->bag->hasHeader('secfetchmode'));
+        $this->assertFalse($this->bag->hasHeader('SecFetchMode'));
+    }
+}

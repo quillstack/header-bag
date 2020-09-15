@@ -19,7 +19,7 @@ final class SimpleHeaders
         'if-modified-since' => 'Fri, 11 Sep 2020 20:46:34 GMT',
         'if-none-match' => 'W/"5f5be22a-58c"',
         'sec-fetch-dest' => 'document',
-        'sec-fetch-mode' => 'navigate',
+        'Sec-Fetch-Mode' => 'navigate',
         'sec-fetch-site' => 'none',
         'sec-fetch-user' => '?1',
         'upgrade-insecure-requests' => '1',

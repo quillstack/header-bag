@@ -9,21 +9,15 @@ use QuillStack\Mocks\HeaderBag\SimpleHeaders;
 
 final class GetHeaderLineTest extends TestCase
 {
-
     /**
      * @var HeaderBag
      */
     private HeaderBag $bag;
 
-    /**
-     * @var string[]
-     */
-    private array $headers;
-
     protected function setUp(): void
     {
-        $this->headers = (new SimpleHeaders())->headers;
-        $this->bag = new HeaderBag($this->headers);
+        $headers = (new SimpleHeaders())->headers;
+        $this->bag = new HeaderBag($headers);
     }
 
     public function testHasOneWordHeader()

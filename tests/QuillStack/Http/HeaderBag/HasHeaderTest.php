@@ -14,15 +14,10 @@ final class HasHeaderTest extends TestCase
      */
     private HeaderBag $bag;
 
-    /**
-     * @var string[]
-     */
-    private array $headers;
-
     public function setUp(): void
     {
-        $this->headers = (new SimpleHeaders())->headers;
-        $this->bag = new HeaderBag($this->headers);
+        $headers = (new SimpleHeaders())->headers;
+        $this->bag = new HeaderBag($headers);
     }
 
     public function testHasOneWordHeader()

@@ -37,6 +37,15 @@ final class GetHeaderTest extends TestCase
         $this->assertEquals(['W/"5f5be22a-58c"'], $this->bag->getHeader('If-None-Match'));
     }
 
+    public function testHasManyWordsInValue()
+    {
+        $this->assertEquals([
+            'gzip',
+            'deflate',
+            'br',
+        ], $this->bag->getHeader('accept-encoding'));
+    }
+
     public function testHasCamelCaseWordsHeader()
     {
         $this->assertEquals(['navigate'], $this->bag->getHeader('sec-fetch-mode'));

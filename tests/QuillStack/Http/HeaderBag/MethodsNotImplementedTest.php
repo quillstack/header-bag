@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace QuillStack\Http\HeaderBag;
 
 use PHPUnit\Framework\TestCase;
+use QuillStack\Http\HeaderBag\Exceptions\MethodNotImplementedException;
 use QuillStack\Mocks\HeaderBag\Stream;
 
 final class MethodsNotImplementedTest extends TestCase

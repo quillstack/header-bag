@@ -6,6 +6,8 @@ namespace QuillStack\Http\HeaderBag;
 
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
+use QuillStack\Http\HeaderBag\Exceptions\InvalidHeaderArgumentException;
+use QuillStack\Http\HeaderBag\Exceptions\MethodNotImplementedException;
 
 final class HeaderBag implements MessageInterface
 {
@@ -67,7 +69,7 @@ final class HeaderBag implements MessageInterface
 
         $index = $this->getHeaderIndex($name);
 
-        return explode(',', array_values($this->headers)[$index]);
+        return array_map('trim', explode(',', array_values($this->headers)[$index]));
     }
 
     /**
@@ -75,13 +77,13 @@ final class HeaderBag implements MessageInterface
      */
     public function getHeaderLine($name)
     {
-        $header = $this->getHeader($name);
-
-        if ($header === []) {
+        if (!$this->hasHeader($name)) {
             return '';
         }
 
-        return current($header);
+        $index = $this->getHeaderIndex($name);
+
+        return array_values($this->headers)[$index];
     }
 
     /**
@@ -90,11 +92,11 @@ final class HeaderBag implements MessageInterface
     public function withHeader($name, $value)
     {
         if (!is_string($name)) {
-            throw new InvalidArgumentException('Header name is not string');
+            throw new InvalidHeaderArgumentException('Header name is not string');
         }
 
         if (!is_string($value) && !is_array($value)) {
-            throw new InvalidArgumentException('Header value is not string or array');
+            throw new InvalidHeaderArgumentException('Header value is not string or array');
         }
 
         $new = clone $this;

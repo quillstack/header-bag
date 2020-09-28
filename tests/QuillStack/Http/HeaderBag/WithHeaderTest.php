@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace QuillStack\Http\HeaderBag;
 
 use PHPUnit\Framework\TestCase;
+use QuillStack\Http\HeaderBag\Exceptions\InvalidHeaderArgumentException;
 use QuillStack\Mocks\HeaderBag\SimpleHeaders;
 
 final class WithHeaderTest extends TestCase
@@ -50,5 +51,35 @@ final class WithHeaderTest extends TestCase
 
         $this->assertEquals('/', $this->bag->getHeaderLine(self::EXISTING_HEADER));
         $this->assertEquals('/test', $bag->getHeaderLine(self::EXISTING_HEADER));
+    }
+
+    public function testNameIsNotStringException()
+    {
+        $this->expectException(InvalidHeaderArgumentException::class);
+
+        $this->bag->withHeader(['test'], '/test');
+    }
+
+    public function provideInvalidValues()
+    {
+        return [
+            [3],
+            [false],
+            [true],
+            [new \stdClass()],
+            [-1.23],
+            [null],
+        ];
+    }
+
+    /**
+     * @param $invalidValue
+     * @dataProvider provideInvalidValues
+     */
+    public function testValueIsNotStringNorArrayException($invalidValue)
+    {
+        $this->expectException(InvalidHeaderArgumentException::class);
+
+        $this->bag->withHeader(self::EXISTING_HEADER, $invalidValue);
     }
 }

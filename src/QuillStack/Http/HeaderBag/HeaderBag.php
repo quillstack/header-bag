@@ -99,8 +99,12 @@ final class HeaderBag implements MessageInterface
             throw new InvalidHeaderArgumentException('Header value is not string or array');
         }
 
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
         $new = clone $this;
-        $new->headers[$name] = $value;
+        $new->headers[$name] = implode(',', $value);
         $keyName = strtolower($name);
 
         if (!in_array($keyName, $new->headersKeys)) {
@@ -115,10 +119,22 @@ final class HeaderBag implements MessageInterface
      */
     public function withAddedHeader($name, $value)
     {
+        if (!is_string($name)) {
+            throw new InvalidHeaderArgumentException('Header name is not string');
+        }
+
+        if (!is_string($value) && !is_array($value)) {
+            throw new InvalidHeaderArgumentException('Header value is not string or array');
+        }
+
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
         $new = clone $this;
 
         if ($this->hasHeader($name)) {
-            return $new;
+            $value = $this->getHeaderLine($name) . ',' . implode(',', $value);
         }
 
         return $new->withHeader($name, $value);

@@ -3,7 +3,15 @@
     "description": "A simple solution to use headers according to PSR-7.",
     "type": "library",
     "license": "MIT",
-    "homepage": "https://quillstack.com/headers/",
+    "keywords": [
+        "headers",
+        "http",
+        "header-bag",
+        "php",
+        "psr-7",
+        "php7"
+    ],
+    "homepage": "https://quillstack.com/headers",
     "authors": [
         {
             "name": "Radek Ziemniewicz",

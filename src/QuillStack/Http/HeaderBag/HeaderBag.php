@@ -26,7 +26,7 @@ final class HeaderBag implements MessageInterface
      *
      * @param array $headers
      */
-    public function __construct(array $headers)
+    public function __construct(array $headers = [])
     {
         $this->headers = $headers;
         $this->headersKeys = array_map('strtolower', array_keys($this->headers));

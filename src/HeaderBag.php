@@ -11,16 +11,8 @@ use Quillstack\HeaderBag\Exceptions\MethodNotImplementedException;
 
 class HeaderBag implements MessageInterface
 {
-    /**
-     * @var array
-     */
     private array $headersKeys;
 
-    /**
-     * HeaderBag constructor.
-     *
-     * @param array $headers
-     */
     public function __construct(private array $headers = [])
     {
         $this->headersKeys = array_map('strtolower', array_keys($this->headers));
@@ -42,12 +34,7 @@ class HeaderBag implements MessageInterface
         return in_array(strtolower($name), $this->headersKeys);
     }
 
-    /**
-     * @param $name
-     *
-     * @return int
-     */
-    private function getHeaderIndex($name): int
+    private function getHeaderIndex(string $name): int
     {
         return array_search(strtolower($name), $this->headersKeys);
     }
@@ -134,11 +121,6 @@ class HeaderBag implements MessageInterface
         return $new->withHeader($name, $value);
     }
 
-    /**
-     * @param int $index
-     *
-     * @return string
-     */
     private function getHeaderKeyByIndex(int $index): string
     {
         return array_keys($this->headers)[$index];

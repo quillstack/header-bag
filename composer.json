@@ -1,0 +1,36 @@
+{
+    "name": "quillstack/header-bag",
+    "description": "A simple solution to use headers according to PSR-7.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "headers",
+        "http",
+        "header-bag",
+        "php",
+        "psr-7",
+        "php7"
+    ],
+    "homepage": "https://quillstack.org/headers",
+    "authors": [
+        {
+            "name": "Radek Ziemniewicz",
+            "email": "radek@quillstack.org"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "psr/http-message": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quillstack\\HeaderBag\\": "src/",
+            "Quillstack\\Tests\\HeaderBag\\": "tests/tests/",
+            "Quillstack\\Mocks\\HeaderBag\\": "tests/mocks/"
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.1",
+        "phpunit/phpunit": "^9"
+    }
+}

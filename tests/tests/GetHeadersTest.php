@@ -8,16 +8,9 @@ use PHPUnit\Framework\TestCase;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\Mocks\HeaderBag\SimpleHeaders;
 
-final class GetHeadersTest extends TestCase
+class GetHeadersTest extends TestCase
 {
-    /**
-     * @var HeaderBag
-     */
     private HeaderBag $bag;
-
-    /**
-     * @var string[]
-     */
     private array $headers;
 
     protected function setUp(): void
@@ -33,19 +26,23 @@ final class GetHeadersTest extends TestCase
 
     public function testCount()
     {
-        $this->assertCount(16, $this->headers);
-        $this->assertCount(16, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM_WITH_DUPLICATES, $this->headers);
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
     }
 
     public function testEquals()
     {
-        $this->assertEquals($this->headers, $this->bag->getHeaders());
+        $this->assertNotEquals($this->headers, $this->bag->getHeaders());
     }
 
     public function testValues()
     {
-        foreach ($this->headers as $header) {
-            $this->assertTrue(in_array($header, $this->bag->getHeaders()));
+        foreach ($this->headers as $value) {
+            if ($value === '/') {
+                $this->assertFalse(in_array($value, $this->bag->getHeaders()));
+            } else {
+                $this->assertTrue(in_array($value, $this->bag->getHeaders()));
+            }
         }
     }
 
@@ -54,7 +51,11 @@ final class GetHeadersTest extends TestCase
         $keys = array_keys($this->headers);
 
         foreach ($keys as $key) {
-            $this->assertArrayHasKey($key, $this->bag->getHeaders());
+            if ($key === ':path') {
+                $this->assertArrayNotHasKey($key, $this->bag->getHeaders());
+            } else {
+                $this->assertArrayHasKey($key, $this->bag->getHeaders());
+            }
         }
     }
 }

@@ -9,15 +9,13 @@ use Quillstack\HeaderBag\Exceptions\InvalidHeaderArgumentException;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\Mocks\HeaderBag\SimpleHeaders;
 
-final class WithAddedHeaderTest extends TestCase
+class WithAddedHeaderTest extends TestCase
 {
     private const NEW_HEADER = 'new-header';
-
     private const EXISTING_HEADER = ':path';
+    private const UPPER_CASE_HEADER = 'UPPER';
+    private const UPPER_CASE_IN_LOWER_CASE_HEADER = 'upper';
 
-    /**
-     * @var HeaderBag
-     */
     private HeaderBag $bag;
 
     protected function setUp(): void
@@ -30,8 +28,8 @@ final class WithAddedHeaderTest extends TestCase
     {
         $bag = $this->bag->withAddedHeader(self::NEW_HEADER, 'test');
 
-        $this->assertCount(16, $this->bag->getHeaders());
-        $this->assertCount(17, $bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM + 1, $bag->getHeaders());
 
         $this->assertFalse($this->bag->hasHeader(self::NEW_HEADER));
         $this->assertTrue($bag->hasHeader(self::NEW_HEADER));
@@ -43,29 +41,56 @@ final class WithAddedHeaderTest extends TestCase
     public function testWithExistingHeader()
     {
         $bag = $this->bag->withAddedHeader(self::EXISTING_HEADER, '/test');
-
-        $this->assertCount(16, $this->bag->getHeaders());
-        $this->assertCount(16, $bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $bag->getHeaders());
 
         $this->assertTrue($this->bag->hasHeader(self::EXISTING_HEADER));
         $this->assertTrue($bag->hasHeader(self::EXISTING_HEADER));
 
-        $this->assertEquals('/', $this->bag->getHeaderLine(self::EXISTING_HEADER));
-        $this->assertEquals('/,/test', $bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEquals('/abc', $this->bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEquals('/abc,/test', $bag->getHeaderLine(self::EXISTING_HEADER));
     }
 
     public function testWithExistingHeaderAddArray()
     {
         $bag = $this->bag->withAddedHeader(self::EXISTING_HEADER, ['/test', '/login']);
 
-        $this->assertCount(16, $this->bag->getHeaders());
-        $this->assertCount(16, $bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $bag->getHeaders());
 
         $this->assertTrue($this->bag->hasHeader(self::EXISTING_HEADER));
         $this->assertTrue($bag->hasHeader(self::EXISTING_HEADER));
 
-        $this->assertEquals('/', $this->bag->getHeaderLine(self::EXISTING_HEADER));
-        $this->assertEquals('/,/test,/login', $bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEquals('/abc', $this->bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEquals('/abc,/test,/login', $bag->getHeaderLine(self::EXISTING_HEADER));
+    }
+
+    public function testWithExistingUpperCaseHeaderAddArray()
+    {
+        $bag = $this->bag->withAddedHeader(self::UPPER_CASE_HEADER, ['upper', 'lower']);
+
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $bag->getHeaders());
+
+        $this->assertTrue($this->bag->hasHeader(self::UPPER_CASE_HEADER));
+        $this->assertTrue($bag->hasHeader(self::UPPER_CASE_HEADER));
+
+        $this->assertEquals('case', $this->bag->getHeaderLine(self::UPPER_CASE_HEADER));
+        $this->assertEquals('case,upper,lower', $bag->getHeaderLine(self::UPPER_CASE_HEADER));
+    }
+
+    public function testWithExistingUpperCaseInLowerCaseHeaderAddArray()
+    {
+        $bag = $this->bag->withAddedHeader(self::UPPER_CASE_IN_LOWER_CASE_HEADER, ['a', 'b']);
+
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $bag->getHeaders());
+
+        $this->assertTrue($this->bag->hasHeader(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
+        $this->assertTrue($bag->hasHeader(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
+
+        $this->assertEquals('case', $this->bag->getHeaderLine(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
+        $this->assertEquals('case,a,b', $bag->getHeaderLine(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
     }
 
     public function testNameIsNotStringException()

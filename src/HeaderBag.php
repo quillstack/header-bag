@@ -11,32 +11,17 @@ use Quillstack\HeaderBag\Exceptions\MethodNotImplementedException;
 
 class HeaderBag implements MessageInterface
 {
-    private array $headersKeys;
+    /**
+     * Internal array to store all header keys to optimise search.
+     */
+    private array $headersKeys = [];
 
+    /**
+     * Constructor.
+     */
     public function __construct(private array $headers = [])
     {
-        $this->headersKeys = array_map('strtolower', array_keys($this->headers));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasHeader($name)
-    {
-        return in_array(strtolower($name), $this->headersKeys);
-    }
-
-    private function getHeaderIndex(string $name): int
-    {
-        return array_search(strtolower($name), $this->headersKeys);
+        $this->filterUniqueValues();
     }
 
     /**
@@ -70,29 +55,17 @@ class HeaderBag implements MessageInterface
     /**
      * {@inheritDoc}
      */
-    public function withHeader($name, $value)
+    public function getHeaders()
     {
-        if (!is_string($name)) {
-            throw new InvalidHeaderArgumentException('Header name is not string');
-        }
+        return $this->headers;
+    }
 
-        if (!is_string($value) && !is_array($value)) {
-            throw new InvalidHeaderArgumentException('Header value is not string or array');
-        }
-
-        if (is_string($value)) {
-            $value = [$value];
-        }
-
-        $new = clone $this;
-        $new->headers[$name] = implode(',', $value);
-        $keyName = strtolower($name);
-
-        if (!in_array($keyName, $new->headersKeys)) {
-            $new->headersKeys[] = $keyName;
-        }
-
-        return $new;
+    /**
+     * {@inheritDoc}
+     */
+    public function hasHeader($name)
+    {
+        return isset($this->headersKeys[strtolower($name)]);
     }
 
     /**
@@ -100,13 +73,7 @@ class HeaderBag implements MessageInterface
      */
     public function withAddedHeader($name, $value)
     {
-        if (!is_string($name)) {
-            throw new InvalidHeaderArgumentException('Header name is not string');
-        }
-
-        if (!is_string($value) && !is_array($value)) {
-            throw new InvalidHeaderArgumentException('Header value is not string or array');
-        }
+        $this->validateNameAndValue($name, $value);
 
         if (is_string($value)) {
             $value = [$value];
@@ -121,9 +88,21 @@ class HeaderBag implements MessageInterface
         return $new->withHeader($name, $value);
     }
 
-    private function getHeaderKeyByIndex(int $index): string
+    /**
+     * {@inheritDoc}
+     */
+    public function withHeader($name, $value)
     {
-        return array_keys($this->headers)[$index];
+        $this->validateNameAndValue($name, $value);
+
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
+        $headers = $this->headers;
+        $headers[$name] = implode(',', $value);
+
+        return new self($headers);
     }
 
     /**
@@ -140,10 +119,65 @@ class HeaderBag implements MessageInterface
         $index = $this->getHeaderIndex($name);
         $key = $this->getHeaderKeyByIndex($index);
 
-        unset($new->headersKeys[$index]);
+        unset($new->headersKeys[strtolower($key)]);
         unset($new->headers[$key]);
 
         return $new;
+    }
+
+    /**
+     * Create unique headers array.
+     */
+    private function filterUniqueValues()
+    {
+        $headers = [];
+
+        foreach ($this->headers as $key => $header) {
+            $lowerKey = strtolower($key);
+
+            if (!isset($this->headersKeys[$lowerKey])) {
+                $this->headersKeys[$lowerKey] = $key;
+                $headers[$key] = $header;
+            } elseif (isset($this->headersKeys[$lowerKey]) && isset($headers[$this->headersKeys[$lowerKey]])) {
+                unset($headers[$this->headersKeys[$lowerKey]]);
+                unset($this->headersKeys[$lowerKey]);
+
+                $this->headersKeys[$lowerKey] = $key;
+                $headers[$this->headersKeys[$lowerKey]] = $header;
+            }
+        }
+
+        $this->headers = $headers;
+    }
+
+    /**
+     * Gets the header index from the internal headersKeys array.
+     */
+    private function getHeaderIndex(string $name): int
+    {
+        return array_search(strtolower($name), array_keys($this->headersKeys));
+    }
+
+    /**
+     * Gets the header key by its index.
+     */
+    private function getHeaderKeyByIndex(int $index): string
+    {
+        return array_keys($this->headers)[$index];
+    }
+
+    /**
+     * Validates the header name and the header value.
+     */
+    private function validateNameAndValue($name, $value): void
+    {
+        if (!is_string($name)) {
+            throw new InvalidHeaderArgumentException('Header name is not string');
+        }
+
+        if (!is_string($value) && !is_array($value)) {
+            throw new InvalidHeaderArgumentException('Header value is neither string nor array');
+        }
     }
 
     /**

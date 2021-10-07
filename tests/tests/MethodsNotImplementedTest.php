@@ -9,11 +9,8 @@ use Quillstack\HeaderBag\Exceptions\MethodNotImplementedException;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\Mocks\HeaderBag\Stream;
 
-final class MethodsNotImplementedTest extends TestCase
+class MethodsNotImplementedTest extends TestCase
 {
-    /**
-     * @var HeaderBag
-     */
     private HeaderBag $bag;
 
     public function setUp(): void

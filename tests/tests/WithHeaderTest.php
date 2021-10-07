@@ -10,14 +10,11 @@ use Quillstack\HeaderBag\Exceptions\InvalidHeaderArgumentException;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\Mocks\HeaderBag\SimpleHeaders;
 
-final class WithHeaderTest extends TestCase
+class WithHeaderTest extends TestCase
 {
     private const NEW_HEADER = 'new-header';
     private const EXISTING_HEADER = ':path';
 
-    /**
-     * @var HeaderBag
-     */
     private HeaderBag $bag;
 
     protected function setUp(): void
@@ -30,8 +27,8 @@ final class WithHeaderTest extends TestCase
     {
         $bag = $this->bag->withHeader(self::NEW_HEADER, 'test');
 
-        $this->assertCount(16, $this->bag->getHeaders());
-        $this->assertCount(17, $bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM + 1, $bag->getHeaders());
 
         $this->assertFalse($this->bag->hasHeader(self::NEW_HEADER));
         $this->assertTrue($bag->hasHeader(self::NEW_HEADER));
@@ -44,13 +41,13 @@ final class WithHeaderTest extends TestCase
     {
         $bag = $this->bag->withHeader(self::EXISTING_HEADER, '/test');
 
-        $this->assertCount(16, $this->bag->getHeaders());
-        $this->assertCount(16, $bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
+        $this->assertCount(SimpleHeaders::HEADERS_NUM, $bag->getHeaders());
 
         $this->assertTrue($this->bag->hasHeader(self::EXISTING_HEADER));
         $this->assertTrue($bag->hasHeader(self::EXISTING_HEADER));
 
-        $this->assertEquals('/', $this->bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEquals('/abc', $this->bag->getHeaderLine(self::EXISTING_HEADER));
         $this->assertEquals('/test', $bag->getHeaderLine(self::EXISTING_HEADER));
     }
 

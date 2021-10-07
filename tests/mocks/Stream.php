@@ -6,7 +6,7 @@ namespace Quillstack\Mocks\HeaderBag;
 
 use Psr\Http\Message\StreamInterface;
 
-final class Stream implements StreamInterface
+class Stream implements StreamInterface
 {
     public function __toString()
     {

@@ -8,11 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\Mocks\HeaderBag\SimpleHeaders;
 
-final class GetHeaderLineTest extends TestCase
+class GetHeaderLineTest extends TestCase
 {
-    /**
-     * @var HeaderBag
-     */
     private HeaderBag $bag;
 
     protected function setUp(): void

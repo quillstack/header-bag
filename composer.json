@@ -25,12 +25,10 @@
     "autoload": {
         "psr-4": {
             "Quillstack\\HeaderBag\\": "src/",
-            "Quillstack\\Tests\\HeaderBag\\": "tests/tests/",
-            "Quillstack\\Mocks\\HeaderBag\\": "tests/mocks/"
+            "Quillstack\\HeaderBag\\Tests\\": "tests/"
         }
     },
     "require-dev": {
-        "symfony/var-dumper": "^5.1",
-        "phpunit/phpunit": "^9"
+        "quillstack/unit-tests": "^0.2.0"
     }
 }

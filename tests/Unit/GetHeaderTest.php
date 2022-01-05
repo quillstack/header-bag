@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Quillstack\Tests\HeaderBag;
+namespace Quillstack\HeaderBag\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Quillstack\HeaderBag\HeaderBag;
-use Quillstack\Mocks\HeaderBag\SimpleHeaders;
+use Quillstack\HeaderBag\Tests\Mocks\SimpleHeaders;
 
 class GetHeaderTest extends TestCase
 {

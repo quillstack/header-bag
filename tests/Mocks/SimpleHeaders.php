@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Quillstack\Mocks\HeaderBag;
+namespace Quillstack\HeaderBag\Tests\Mocks;
 
 class SimpleHeaders
 {

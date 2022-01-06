@@ -30,5 +30,10 @@
     },
     "require-dev": {
         "quillstack/unit-tests": "^0.2.3"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
     }
 }

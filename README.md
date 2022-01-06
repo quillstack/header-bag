@@ -1,6 +1,6 @@
 # Quillstack Headers
 
-[![Build Status](https://app.travis-ci.com/quillstack/header-bag.svg?branch=master)](https://app.travis-ci.com/quillstack/header-bag)
+[![Build Status](https://app.travis-ci.com/quillstack/header-bag.svg?branch=main)](https://app.travis-ci.com/quillstack/header-bag)
 [![Downloads](https://img.shields.io/packagist/dt/quillstack/header-bag.svg)](https://packagist.org/packages/quillstack/header-bag)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=coverage)](https://sonarcloud.io/dashboard?id=quillstack_header-bag)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=ncloc)](https://sonarcloud.io/dashboard?id=quillstack_header-bag)
@@ -22,13 +22,7 @@ https://quillstack.org/headers
 Run tests using a command:
 
 ```
-phpdbg -qrr vendor/bin/phpunit
-```
-
-Check the tests coverage:
-
-```
-phpdbg -qrr vendor/bin/phpunit --coverage-html coverage tests
+phpdbg -qrr ./vendor/bin/unit-tests
 ```
 
 ## Docker

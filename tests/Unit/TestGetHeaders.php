@@ -6,6 +6,7 @@ namespace Quillstack\HeaderBag\Tests\Unit;
 
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\HeaderBag\Tests\Mocks\SimpleHeaders;
+use Quillstack\UnitTests\AssertEqual;
 use Quillstack\UnitTests\Types\AssertArray;
 use Quillstack\UnitTests\Types\AssertBoolean;
 
@@ -14,8 +15,11 @@ class TestGetHeaders
     private HeaderBag $bag;
     private array $headers;
 
-    public function __construct(private AssertArray $assertArray, private AssertBoolean $assertBoolean)
-    {
+    public function __construct(
+        private AssertArray $assertArray,
+        private AssertBoolean $assertBoolean,
+        private AssertEqual $assertEqual
+    ) {
         $this->headers = (new SimpleHeaders())->headers;
         $this->bag = new HeaderBag($this->headers);
     }
@@ -25,38 +29,41 @@ class TestGetHeaders
         $this->assertArray->isArray($this->bag->getHeaders());
     }
 
-    public function count()
+    /**
+     * The fixture names one header twice, in two cases, and both stand for the same header.
+     */
+    public function namesDifferingOnlyInCaseAreOneHeader()
     {
         $this->assertArray->count(SimpleHeaders::HEADERS_NUM_WITH_DUPLICATES, $this->headers);
         $this->assertArray->count(SimpleHeaders::HEADERS_NUM, $this->bag->getHeaders());
     }
 
-    public function equals()
+    /**
+     * PSR-7 keeps a list of values per header, so every value is wrapped in an array.
+     */
+    public function everyHeaderHoldsAListOfValues()
     {
-        $this->assertArray->notEqual($this->headers, $this->bag->getHeaders());
-    }
-
-    public function values()
-    {
-        foreach ($this->headers as $value) {
-            if ($value === '/') {
-                $this->assertBoolean->isFalse(in_array($value, $this->bag->getHeaders()));
-            } else {
-                $this->assertBoolean->isTrue(in_array($value, $this->bag->getHeaders()));
-            }
+        foreach ($this->bag->getHeaders() as $name => $values) {
+            $this->assertArray->isArray($values);
+            $this->assertEqual->equal($values, $this->bag->getHeader($name));
         }
     }
 
-    public function keys()
+    public function theHeaderKeepsTheNameItWasFirstSeenUnder()
     {
-        $keys = array_keys($this->headers);
+        $headers = $this->bag->getHeaders();
 
-        foreach ($keys as $key) {
-            if ($key === ':path') {
-                $this->assertArray->doesntHaveKey($key, $this->bag->getHeaders());
-            } else {
-                $this->assertArray->hasKey($key, $this->bag->getHeaders());
-            }
+        $this->assertArray->hasKey(':path', $headers);
+        $this->assertArray->doesntHaveKey(':PATH', $headers);
+
+        // The later value replaces the earlier one, under the name seen first.
+        $this->assertEqual->equal(['/abc'], $headers[':path']);
+    }
+
+    public function everyNameOfTheFixtureIsFound()
+    {
+        foreach (array_keys($this->headers) as $name) {
+            $this->assertBoolean->isTrue($this->bag->hasHeader($name));
         }
     }
 }

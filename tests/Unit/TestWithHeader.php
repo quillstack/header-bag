@@ -13,6 +13,7 @@ use Quillstack\UnitTests\AssertExceptions;
 use Quillstack\UnitTests\Attributes\ProvidesDataFrom;
 use Quillstack\UnitTests\Types\AssertArray;
 use Quillstack\UnitTests\Types\AssertBoolean;
+use TypeError;
 
 class TestWithHeader
 {
@@ -62,7 +63,7 @@ class TestWithHeader
     #[ProvidesDataFrom(InvalidHeaderValueDataProvider::class)]
     public function nameIsNotStringException()
     {
-        $this->assertExceptions->expect(InvalidHeaderArgumentException::class);
+        $this->assertExceptions->expect(TypeError::class);
 
         $this->bag->withHeader(['test'], '/test');
     }
@@ -70,7 +71,7 @@ class TestWithHeader
     #[ProvidesDataFrom(InvalidHeaderValueDataProvider::class)]
     public function valueIsNotStringNorArrayException($invalidValue)
     {
-        $this->assertExceptions->expect(InvalidHeaderArgumentException::class);
+        $this->assertExceptions->expect(TypeError::class);
 
         $this->bag->withHeader(self::EXISTING_HEADER, $invalidValue);
     }

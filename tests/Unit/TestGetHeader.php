@@ -30,13 +30,24 @@ class TestGetHeader
         $this->assertEqual->equal(['W/"5f5be22a-58c"'], $this->bag->getHeader('If-None-Match'));
     }
 
-    public function hasManyWordsInValue()
+    /**
+     * A value given as one string stays one value. Splitting it on commas used to break
+     * every header whose value legitimately holds them, dates and cookies among them.
+     */
+    public function aValueWithCommasStaysOneValue()
     {
-        $this->assertEqual->equal([
-            'gzip',
-            'deflate',
-            'br',
-        ], $this->bag->getHeader('accept-encoding'));
+        $this->assertEqual->equal(['gzip, deflate, br'], $this->bag->getHeader('accept-encoding'));
+        $this->assertEqual->equal(
+            ['Fri, 11 Sep 2020 20:46:34 GMT'],
+            $this->bag->getHeader('if-modified-since')
+        );
+    }
+
+    public function severalValuesAreGivenAsAnArray()
+    {
+        $bag = $this->bag->withHeader('set-cookie', ['a=1', 'b=2']);
+
+        $this->assertEqual->equal(['a=1', 'b=2'], $bag->getHeader('Set-Cookie'));
     }
 
     public function hasCamelCaseWordsHeader()

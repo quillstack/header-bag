@@ -13,6 +13,7 @@ use Quillstack\UnitTests\AssertExceptions;
 use Quillstack\UnitTests\Attributes\ProvidesDataFrom;
 use Quillstack\UnitTests\Types\AssertArray;
 use Quillstack\UnitTests\Types\AssertBoolean;
+use TypeError;
 
 class TestWithAddedHeader
 {
@@ -58,7 +59,7 @@ class TestWithAddedHeader
         $this->assertBoolean->isTrue($bag->hasHeader(self::EXISTING_HEADER));
 
         $this->assertEqual->equal('/abc', $this->bag->getHeaderLine(self::EXISTING_HEADER));
-        $this->assertEqual->equal('/abc,/test', $bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEqual->equal('/abc, /test', $bag->getHeaderLine(self::EXISTING_HEADER));
     }
 
     public function withExistingHeaderAddArray()
@@ -72,7 +73,7 @@ class TestWithAddedHeader
         $this->assertBoolean->isTrue($bag->hasHeader(self::EXISTING_HEADER));
 
         $this->assertEqual->equal('/abc', $this->bag->getHeaderLine(self::EXISTING_HEADER));
-        $this->assertEqual->equal('/abc,/test,/login', $bag->getHeaderLine(self::EXISTING_HEADER));
+        $this->assertEqual->equal('/abc, /test, /login', $bag->getHeaderLine(self::EXISTING_HEADER));
     }
 
     public function withExistingUpperCaseHeaderAddArray()
@@ -86,7 +87,7 @@ class TestWithAddedHeader
         $this->assertBoolean->isTrue($bag->hasHeader(self::UPPER_CASE_HEADER));
 
         $this->assertEqual->equal('case', $this->bag->getHeaderLine(self::UPPER_CASE_HEADER));
-        $this->assertEqual->equal('case,upper,lower', $bag->getHeaderLine(self::UPPER_CASE_HEADER));
+        $this->assertEqual->equal('case, upper, lower', $bag->getHeaderLine(self::UPPER_CASE_HEADER));
     }
 
     public function withExistingUpperCaseInLowerCaseHeaderAddArray()
@@ -100,12 +101,12 @@ class TestWithAddedHeader
         $this->assertBoolean->isTrue($bag->hasHeader(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
 
         $this->assertEqual->equal('case', $this->bag->getHeaderLine(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
-        $this->assertEqual->equal('case,a,b', $bag->getHeaderLine(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
+        $this->assertEqual->equal('case, a, b', $bag->getHeaderLine(self::UPPER_CASE_IN_LOWER_CASE_HEADER));
     }
 
     public function nameIsNotStringException()
     {
-        $this->assertExceptions->expect(InvalidHeaderArgumentException::class);
+        $this->assertExceptions->expect(TypeError::class);
 
         $this->bag->withAddedHeader(['test'], '/test');
     }
@@ -113,8 +114,19 @@ class TestWithAddedHeader
     #[ProvidesDataFrom(InvalidHeaderValueDataProvider::class)]
     public function valueIsNotStringNorArrayException($invalidValue)
     {
-        $this->assertExceptions->expect(InvalidHeaderArgumentException::class);
+        $this->assertExceptions->expect(TypeError::class);
 
         $this->bag->withAddedHeader(self::EXISTING_HEADER, $invalidValue);
+    }
+
+    /**
+     * The type declaration cannot say that an array has to hold strings, so this one is
+     * still checked by hand.
+     */
+    public function valuesInsideTheArrayHaveToBeStrings()
+    {
+        $this->assertExceptions->expect(InvalidHeaderArgumentException::class);
+
+        $this->bag->withAddedHeader(self::EXISTING_HEADER, ['fine', 3]);
     }
 }

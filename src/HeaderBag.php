@@ -4,58 +4,39 @@ declare(strict_types=1);
 
 namespace Quillstack\HeaderBag;
 
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\StreamInterface;
 use Quillstack\HeaderBag\Exceptions\InvalidHeaderArgumentException;
-use Quillstack\HeaderBag\Exceptions\MethodNotImplementedException;
 
-class HeaderBag implements MessageInterface
+class HeaderBag implements HeaderBagInterface
 {
     /**
-     * Internal array to store all header keys to optimise search.
+     * The values of every header, keyed by the name it was given under.
+     *
+     * @var array<string, string[]>
      */
-    private array $headersKeys = [];
+    private array $headers = [];
 
     /**
-     * Constructor.
+     * Maps a lowercased name to the name the header is stored under, so a header can be
+     * found whatever case it is asked for.
+     *
+     * @var array<string, string>
      */
-    public function __construct(private array $headers = [])
-    {
-        $this->filterUniqueValues();
-    }
+    private array $names = [];
 
     /**
-     * {@inheritDoc}
+     * @param array<string, string|string[]> $headers
      */
-    public function getHeader($name)
+    public function __construct(array $headers = [])
     {
-        if (!$this->hasHeader($name)) {
-            return [];
+        foreach ($headers as $name => $value) {
+            $this->set((string) $name, $value);
         }
-
-        $index = $this->getHeaderIndex($name);
-
-        return array_map('trim', explode(',', array_values($this->headers)[$index]));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getHeaderLine($name)
-    {
-        if (!$this->hasHeader($name)) {
-            return '';
-        }
-
-        $index = $this->getHeaderIndex($name);
-
-        return array_values($this->headers)[$index];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -63,152 +44,110 @@ class HeaderBag implements MessageInterface
     /**
      * {@inheritDoc}
      */
-    public function hasHeader($name)
+    public function getHeader(string $name): array
     {
-        return isset($this->headersKeys[strtolower($name)]);
+        return $this->headers[$this->names[strtolower($name)] ?? ''] ?? [];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function withAddedHeader($name, $value)
+    public function getHeaderLine(string $name): string
     {
-        $this->validateNameAndValue($name, $value);
-
-        if (is_string($value)) {
-            $value = [$value];
-        }
-
-        $new = clone $this;
-
-        if ($this->hasHeader($name)) {
-            $value = $this->getHeaderLine($name) . ',' . implode(',', $value);
-        }
-
-        return $new->withHeader($name, $value);
+        return implode(', ', $this->getHeader($name));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function withHeader($name, $value)
+    public function hasHeader(string $name): bool
     {
-        $this->validateNameAndValue($name, $value);
-
-        if (is_string($value)) {
-            $value = [$value];
-        }
-
-        $headers = $this->headers;
-        $headers[$name] = implode(',', $value);
-
-        return new self($headers);
+        return isset($this->names[strtolower($name)]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function withoutHeader($name)
+    public function withHeader(string $name, string|array $value): static
     {
         $new = clone $this;
-
-        if (!$this->hasHeader($name)) {
-            return $new;
-        }
-
-        $index = $this->getHeaderIndex($name);
-        $key = $this->getHeaderKeyByIndex($index);
-
-        unset($new->headersKeys[strtolower($key)]);
-        unset($new->headers[$key]);
+        $new->remove($name);
+        $new->set($name, $value);
 
         return $new;
     }
 
     /**
-     * Create unique headers array.
+     * {@inheritDoc}
      */
-    private function filterUniqueValues()
+    public function withAddedHeader(string $name, string|array $value): static
     {
-        $headers = [];
+        $new = clone $this;
+        $new->set($name, $value, true);
 
-        foreach ($this->headers as $key => $header) {
-            $lowerKey = strtolower($key);
+        return $new;
+    }
 
-            if (!isset($this->headersKeys[$lowerKey])) {
-                $this->headersKeys[$lowerKey] = $key;
-                $headers[$key] = $header;
-            } elseif (isset($this->headersKeys[$lowerKey]) && isset($headers[$this->headersKeys[$lowerKey]])) {
-                unset($headers[$this->headersKeys[$lowerKey]]);
-                unset($this->headersKeys[$lowerKey]);
+    /**
+     * {@inheritDoc}
+     */
+    public function withoutHeader(string $name): static
+    {
+        $new = clone $this;
+        $new->remove($name);
 
-                $this->headersKeys[$lowerKey] = $key;
-                $headers[$this->headersKeys[$lowerKey]] = $header;
+        return $new;
+    }
+
+    /**
+     * Stores the values of a header, either replacing what was there or adding to it. A
+     * name already known under a different case keeps the case it was first stored with.
+     *
+     * @param string|string[] $value
+     */
+    private function set(string $name, mixed $value, bool $add = false): void
+    {
+        $values = $this->readValues($value);
+        $key = strtolower($name);
+        $storedName = $this->names[$key] ?? $name;
+
+        $this->names[$key] = $storedName;
+        $this->headers[$storedName] = $add
+            ? [...$this->headers[$storedName] ?? [], ...$values]
+            : $values;
+    }
+
+    private function remove(string $name): void
+    {
+        $key = strtolower($name);
+
+        if (!isset($this->names[$key])) {
+            return;
+        }
+
+        unset($this->headers[$this->names[$key]], $this->names[$key]);
+    }
+
+    /**
+     * A header holds a list of values. One string is one value: a string carrying commas
+     * is a single field value, not several, which is what keeps dates and cookies whole.
+     *
+     * @return string[]
+     */
+    private function readValues(mixed $value): array
+    {
+        if (!is_string($value) && !is_array($value)) {
+            throw new InvalidHeaderArgumentException('Header value is neither a string nor an array of strings');
+        }
+
+        $values = is_array($value) ? $value : [$value];
+
+        foreach ($values as $one) {
+            if (!is_string($one)) {
+                throw new InvalidHeaderArgumentException('Header values have to be strings');
             }
         }
 
-        $this->headers = $headers;
-    }
-
-    /**
-     * Gets the header index from the internal headersKeys array.
-     */
-    private function getHeaderIndex(string $name): int
-    {
-        return array_search(strtolower($name), array_keys($this->headersKeys));
-    }
-
-    /**
-     * Gets the header key by its index.
-     */
-    private function getHeaderKeyByIndex(int $index): string
-    {
-        return array_keys($this->headers)[$index];
-    }
-
-    /**
-     * Validates the header name and the header value.
-     */
-    private function validateNameAndValue($name, $value): void
-    {
-        if (!is_string($name)) {
-            throw new InvalidHeaderArgumentException('Header name is not string');
-        }
-
-        if (!is_string($value) && !is_array($value)) {
-            throw new InvalidHeaderArgumentException('Header value is neither string nor array');
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getProtocolVersion()
-    {
-        throw new MethodNotImplementedException('Method `getProtocolVersion` doesn\'t exist');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function withProtocolVersion($version)
-    {
-        throw new MethodNotImplementedException('Method `withProtocolVersion` doesn\'t exist');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getBody()
-    {
-        throw new MethodNotImplementedException('Method `getBody` doesn\'t exist');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function withBody(StreamInterface $body)
-    {
-        throw new MethodNotImplementedException('Method `withBody` doesn\'t exist');
+        return array_values($values);
     }
 }

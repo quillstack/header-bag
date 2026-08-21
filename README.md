@@ -1,6 +1,6 @@
 # Quillstack Headers
 
-[![Build Status](https://app.travis-ci.com/quillstack/header-bag.svg?branch=main)](https://app.travis-ci.com/quillstack/header-bag)
+[![Tests](https://github.com/quillstack/header-bag/actions/workflows/tests.yml/badge.svg)](https://github.com/quillstack/header-bag/actions/workflows/tests.yml)
 [![Downloads](https://img.shields.io/packagist/dt/quillstack/header-bag.svg)](https://packagist.org/packages/quillstack/header-bag)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=coverage)](https://sonarcloud.io/dashboard?id=quillstack_header-bag)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=ncloc)](https://sonarcloud.io/dashboard?id=quillstack_header-bag)

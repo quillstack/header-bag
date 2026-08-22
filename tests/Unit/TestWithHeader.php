@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Quillstack\HeaderBag\Tests\Unit;
 
-use Quillstack\HeaderBag\Exceptions\InvalidHeaderArgumentException;
 use Quillstack\HeaderBag\HeaderBag;
 use Quillstack\HeaderBag\Tests\DataProviders\InvalidHeaderValueDataProvider;
 use Quillstack\HeaderBag\Tests\Mocks\SimpleHeaders;

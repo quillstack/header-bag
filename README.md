@@ -22,19 +22,30 @@ regard to case, and the wire format is not the format anything wants to work wit
 them the way PSR-7 says they are held, and leaves the joining and splitting to the places that
 actually need it.
 
-### Requirements
+## Why this exists
+
+HTTP header names do not care about case. `Content-Type`, `content-type` and `CONTENT-TYPE` are
+the same header, and a client somewhere will send each of them. Every PSR-7 message has to
+handle that, and in most implementations the handling lives inside the message class — so if you
+want headers anywhere else, you carry a whole request or response around to get them.
+
+This is that part on its own: a bag which matches without regard for case, and which nothing
+else in this framework has to reimplement. Requests, responses and the HTTP client all use the
+same one.
+
+## Requirements
 
 - PHP 8.1 or newer
 
-### Installation
+## Installation
 
 ```shell
 composer require quillstack/header-bag
 ```
 
-### Usage
+## Usage
 
-#### Reading
+### Reading
 
 ```php
 use Quillstack\HeaderBag\HeaderBag;
@@ -52,7 +63,7 @@ $headers->getHeaders();                   // ['Content-Type' => [...], 'Set-Cook
 
 A name is matched without regard to case, and kept as it was first written.
 
-#### Changing
+### Changing
 
 Every change gives back a copy, so the bag you were handed stays as it was:
 
@@ -66,7 +77,7 @@ $next = $headers
 `withHeader()` replaces every value under that name; `withAddedHeader()` puts one beside the
 ones already there.
 
-### Technical documentation
+## Technical documentation
 
 `HeaderBag` implements `HeaderBagInterface`, which is this package's own rather than PSR-7's
 `MessageInterface` — a bag of headers is not a message, and pretending otherwise means
@@ -89,19 +100,50 @@ legitimately contains one, a date among them.
 `InvalidHeaderArgumentException` (extending `HeaderBagException`) is thrown when a value is
 neither a string nor a list of them.
 
-### Unit tests
+## Benchmark
+
+There is one comparable library. `symfony/http-foundation` has a `HeaderBag` that does the same
+job standalone; `nyholm/psr7`, `guzzlehttp/psr7` and `laminas-diactoros` all keep their header
+handling inside the message classes, so there is nothing there to compare a bag against.
+
+Measured with [quillstack/benchmark](https://github.com/quillstack/benchmark) on five headers,
+built and read back by a name in the wrong case, a thousand times. Runs are interleaved, each
+figure is the median of five, and PHP is 8.5.7.
+
+| | Version |
+| --- | --- |
+| quillstack/header-bag | v0.7.0 |
+| symfony/http-foundation | v7.4.17 |
+
+| | Per bag | Relative |
+| --- | --- | --- |
+| symfony/http-foundation | 3.21 µs | 0.67× |
+| **quillstack/header-bag** | **4.82 µs** | — |
+
+**Symfony's is faster**, by about a third. Its `HeaderBag` also does rather more — cache-control
+directives, cookies, date parsing — while carrying `symfony/http-foundation`, which is 768 kB
+and a dependency on the rest of that component. This package is 16 kB and answers to
+`HeaderBagInterface`.
+
+At under five microseconds a bag, neither number decides anything: a request builds one of
+these.
+
+## Tests
 
 ```shell
 composer test
 ```
 
-### Docker
+## The rest of Quillstack
 
-```shell
-docker-compose up -d
-docker exec -w /var/www/html -it quillstack_header-bag sh
-```
+This is one component of [Quillstack](https://github.com/quillstack), a PHP framework which is
+as simple to use as it is strict about what it does.
 
-### License
+- [quillstack/response](https://github.com/quillstack/response) — which carries one
+- [quillstack/server-request](https://github.com/quillstack/server-request) — which carries one too
+- [quillstack/http-client](https://github.com/quillstack/http-client) — and so does what it sends
+- [quillstack/parameter-bag](https://github.com/quillstack/parameter-bag) — the same idea, without the case
+
+## License
 
 MIT. See [LICENSE](LICENSE).

@@ -6,6 +6,11 @@
 [![PHP Version](https://img.shields.io/packagist/php-v/quillstack/header-bag)](https://packagist.org/packages/quillstack/header-bag)
 [![StyleCI](https://github.styleci.io/repos/295142725/shield?branch=main)](https://github.styleci.io/repos/295142725?branch=main)
 [![CodeFactor](https://www.codefactor.io/repository/github/quillstack/header-bag/badge)](https://www.codefactor.io/repository/github/quillstack/header-bag)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=quillstack_header-bag)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=coverage)](https://sonarcloud.io/summary/new_code?id=quillstack_header-bag)
+[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=quillstack_header-bag)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=quillstack_header-bag)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=quillstack_header-bag&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=quillstack_header-bag)
 [![Maintainability](https://api.codeclimate.com/v1/badges/47cc5782df40c9082f8b/maintainability)](https://codeclimate.com/github/quillstack/header-bag/maintainability)
 [![License](https://img.shields.io/packagist/l/quillstack/header-bag)](https://github.com/quillstack/header-bag/blob/main/LICENSE)
 

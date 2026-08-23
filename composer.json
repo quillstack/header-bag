@@ -11,7 +11,7 @@
         "psr-7",
         "php7"
     ],
-    "homepage": "https://quillstack.org/headers",
+    "homepage": "https://quillstack.org/packages/header-bag",
     "authors": [
         {
             "name": "Radek Ziemniewicz",
